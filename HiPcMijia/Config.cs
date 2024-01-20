@@ -11,8 +11,14 @@ public class Config
 public class FunctionSetting
 {
     public bool PcPower { get; set; }
+    public string PcPowerName { get; set; }
+    
     public bool PcVolume { get; set; }
+    public string PcVolumeName { get; set; }
+    
     public bool PcScreenBrightness { get; set; }
+    public string PcScreenBrightnessName { get; set; }
+    
     public int ReportingInterval { get; set; }
 }
 

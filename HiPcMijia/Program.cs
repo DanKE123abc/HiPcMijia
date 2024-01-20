@@ -33,11 +33,11 @@ public class Program
         Debug.Error("~~~~~~~~~~~~~~Running~~~~~~~~~~~~~~");
 
         if (config.FunctionSetting.PcPower)
-            pcPower = new BemfaConnect(config.BemfaConfig, "PcPower006", PcPowerControl);
+            pcPower = new BemfaConnect(config.BemfaConfig, config.FunctionSetting.PcPowerName, PcPowerControl);
         if (config.FunctionSetting.PcVolume)
-            pcVolume = new BemfaConnect(config.BemfaConfig, "PcVolume002", SetVolumeEvent);
+            pcVolume = new BemfaConnect(config.BemfaConfig, config.FunctionSetting.PcVolumeName, SetVolumeEvent);
         if (config.FunctionSetting.PcScreenBrightness)
-            pcScreenBrightness = new BemfaConnect(config.BemfaConfig, "PcScreenBrightness002", SetScreenBrightnessEvent);
+            pcScreenBrightness = new BemfaConnect(config.BemfaConfig, config.FunctionSetting.PcScreenBrightnessName, SetScreenBrightnessEvent);
         
         while (true)
         {
