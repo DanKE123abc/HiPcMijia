@@ -1,0 +1,37 @@
+{
+    "BemfaConfig":{
+        //巴法云默认配置，无需更改
+        "ip":"bemfa.com",
+        "port":8344,
+        //你的巴法云api key
+        "key":""
+    },
+
+    "FunctionSetting":{
+        "PcPower":true, //是否启用关机控制
+        "PcPowerName":"PcPower006",
+
+        "PcVolume":true, //是否启用音量控制
+        "PcVolumeName":"PcVolume002",
+
+        "PcScreenBrightness":true, //是否启用屏幕亮度控制
+        "PcScreenBrightnessName":"PcScreenBrightness002",
+
+        "ReportingInterval":10000 //信息上报间隔
+    },
+
+    "DeveloperSetting":{ //开发者设置，一般无需更改
+
+        "LogFilePath":"Log.log",
+        "WarningFilePath":"Warning.log",
+        "ErrorFilePath":"Error.log",
+
+        "IsLogEnabled":true,
+        "IsWarningEnabled":true,
+        "IsErrorEnabled":true,
+
+        "AutoCleanuplogFile":false,
+        "AutoStartProcess":true,
+        "BlockMultipleInstances":true
+    }
+}
