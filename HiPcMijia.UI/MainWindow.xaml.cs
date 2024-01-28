@@ -20,38 +20,25 @@ namespace HiPcMijia.UI;
 public partial class MainWindow : Window
 {
     private System.Windows.Forms.NotifyIcon notifyIcon = null;
-    private bool _isMouseInside = true;
 
     public MainWindow()
     {
         InitializeComponent();
         this.MouseLeave += MainWindow_MouseLeave;
-        this.MouseMove += MainWindow_MouseMove;
     }
 
     private void MainWindow_MouseLeave(object sender, MouseEventArgs e)
     {
-        _isMouseInside = false;
         this.Hide();
+        this.Topmost = true;
     }
 
-    private void MainWindow_MouseMove(object sender, MouseEventArgs e)
+    private void MainWindow_OnDeactivated(object? sender, EventArgs e)
     {
-        if (e.LeftButton == MouseButtonState.Pressed)
-        {
-            if (!_isMouseInside)
-            {
-                _isMouseInside = true;
-                this.Show();
-            }
-            //this.DragMove();
-        }
-        else
-        {
-            _isMouseInside = true;
-        }
+        this.Hide();
+        this.Topmost = true;
     }
-
+    
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         init_Window();
@@ -172,4 +159,5 @@ public partial class MainWindow : Window
             this.textBlock.Text = "未连接";
         }
     }
+    
 }

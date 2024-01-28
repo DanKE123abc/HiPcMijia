@@ -8,7 +8,7 @@
         WindowStartupLocation="Manual" 
         Loaded="Window_Loaded" 
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
-        mc:Ignorable="d" ResizeMode="NoResize">
+        mc:Ignorable="d" ResizeMode="NoResize" Deactivated="MainWindow_OnDeactivated">
 
     <Border Background="White" CornerRadius="10" Margin="5">
         <Border.Effect>
