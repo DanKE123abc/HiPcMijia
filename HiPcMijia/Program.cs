@@ -15,6 +15,7 @@ public class Program
     public static BemfaConnect pcPower;
     public static BemfaConnect pcVolume;
     public static BemfaConnect pcScreenBrightness;
+    public static BemfaConnect pcBluetoothEvent;
     public static void Main()
     {
         InitConfig();
@@ -23,7 +24,7 @@ public class Program
         {
             if (System.Diagnostics.Process.GetProcessesByName(strProcessName).Length > 1)
             {
-                Debug.Warning("~~~~~尝试运行多个示例，已阻止~~~~~");
+                Debug.Warning("~~~~~尝试运行多个实例，已阻止~~~~~");
                 return;
             }
         }
@@ -38,7 +39,9 @@ public class Program
             pcVolume = new BemfaConnect(config.BemfaConfig, config.FunctionSetting.PcVolumeName, SetVolumeEvent);
         if (config.FunctionSetting.PcScreenBrightness)
             pcScreenBrightness = new BemfaConnect(config.BemfaConfig, config.FunctionSetting.PcScreenBrightnessName, SetScreenBrightnessEvent);
-        
+        if (config.FunctionSetting.PcBluetooth)
+            pcBluetoothEvent = new BemfaConnect(config.BemfaConfig, config.FunctionSetting.PcBluetoothName, BluetoothEvent);
+
         while (true)
         {
             if (pcPower != null)
@@ -52,23 +55,31 @@ public class Program
 
         void InitConfig()
         {
-            var jsonString = File.ReadAllText(".\\Config.jsonc");
-            config = JSON.ToData<Config>(jsonString,true);
-            if (config.DeveloperSetting.AutoCleanuplogFile)
+            try
             {
-                if (File.Exists(config.DeveloperSetting.LogFilePath))
-                    File.Delete(config.DeveloperSetting.LogFilePath);
-                if (File.Exists(config.DeveloperSetting.WarningFilePath))
-                    File.Delete(config.DeveloperSetting.WarningFilePath);
-                if (File.Exists(config.DeveloperSetting.ErrorFilePath))
-                    File.Delete(config.DeveloperSetting.ErrorFilePath);
+                var jsonString = File.ReadAllText(".\\Config.jsonc");
+                config = JSON.ToData<Config>(jsonString, true);
+                if (config.DeveloperSetting.AutoCleanuplogFile)
+                {
+                    if (File.Exists(config.DeveloperSetting.LogFilePath))
+                        File.Delete(config.DeveloperSetting.LogFilePath);
+                    if (File.Exists(config.DeveloperSetting.WarningFilePath))
+                        File.Delete(config.DeveloperSetting.WarningFilePath);
+                    if (File.Exists(config.DeveloperSetting.ErrorFilePath))
+                        File.Delete(config.DeveloperSetting.ErrorFilePath);
+                }
+                Debug.IsLogEnabled = config.DeveloperSetting.IsLogEnabled;
+                Debug.IsWarningEnabled = config.DeveloperSetting.IsWarningEnabled;
+                Debug.IsErrorEnabled = config.DeveloperSetting.IsErrorEnabled;
+                Debug.LogFilePath = config.DeveloperSetting.LogFilePath;
+                Debug.WarningFilePath = config.DeveloperSetting.WarningFilePath;
+                Debug.ErrorFilePath = config.DeveloperSetting.ErrorFilePath;
             }
-            Debug.IsLogEnabled = config.DeveloperSetting.IsLogEnabled;
-            Debug.IsWarningEnabled = config.DeveloperSetting.IsWarningEnabled;
-            Debug.IsErrorEnabled = config.DeveloperSetting.IsErrorEnabled;
-            Debug.LogFilePath = config.DeveloperSetting.LogFilePath;
-            Debug.WarningFilePath = config.DeveloperSetting.WarningFilePath;
-            Debug.ErrorFilePath = config.DeveloperSetting.ErrorFilePath;
+            catch(Exception ex)
+            {
+                Debug.Warning("读取配置文件出错");
+                return;
+            }
         }
         
         void PcPowerControl(Dictionary<string, string> dictionary)
@@ -122,6 +133,22 @@ public class Program
                     }
                 }
 
+            }
+        }
+
+        void BluetoothEvent(Dictionary<string, string> dictionary)
+        {
+            if (dictionary.ContainsKey("msg"))
+            {
+                var msgValue = dictionary["msg"];
+                if (msgValue == "off")
+                {
+                    WindowsCommand.StopBluetooth();
+                }
+                else if (msgValue == "on")
+                {
+                    WindowsCommand.StartBluetooth();
+                }
             }
         }
     }

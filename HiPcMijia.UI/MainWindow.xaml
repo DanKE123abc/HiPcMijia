@@ -19,6 +19,9 @@
             <Button x:Name="startBtn" Content="开启进程" HorizontalAlignment="Left" Height="34" Margin="10,41,0,0" VerticalAlignment="Top" Width="86" Click="startBtn_Click"/>
             <Button x:Name="stopBtn" Content="停止进程" HorizontalAlignment="Center" Height="34" Margin="0,41,0,0" VerticalAlignment="Top" Width="86" Click="stopBtn_Click"/>
             <Button x:Name="restartBtn" Content="重启进程" HorizontalAlignment="Right" Height="34" Margin="0,41,10,0" VerticalAlignment="Top" Width="86" Click="restartBtn_Click"/>
+            <Button x:Name="setStartUpBtn" Content="设置自启" HorizontalAlignment="Left" Height="34" Margin="10,80,0,0" VerticalAlignment="Top" Width="86" Click="setStartUpBtn_Click"/>
+            <Button x:Name="removeStartUpBtn" Content="取消自启" HorizontalAlignment="Center" Height="34" Margin="0,80,0,0" VerticalAlignment="Top" Width="86" Click="removeStartUpBtn_Click"/>
+            <Button x:Name="quitBtn" Content="退出程序" HorizontalAlignment="Right" Height="34" Margin="0,80,10,0" VerticalAlignment="Top" Width="86" Click="quitBtn_Click"/>
         </Grid>
     </Border>
 
