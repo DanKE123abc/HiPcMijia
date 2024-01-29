@@ -11,6 +11,11 @@ using System.Diagnostics;
 using System.Windows.Media;
 using static System.Net.Mime.MediaTypeNames;
 using Exception = System.Exception;
+using Microsoft.Win32;
+using System.Windows.Forms;
+using Application = System.Windows.Forms.Application;
+using MessageBox = System.Windows.Forms.MessageBox;
+using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 
 namespace HiPcMijia.UI;
 
@@ -23,8 +28,33 @@ public partial class MainWindow : Window
 
     public MainWindow()
     {
-        InitializeComponent();
-        this.MouseLeave += MainWindow_MouseLeave;
+
+        #region 检测
+
+        string MName = System.Diagnostics.Process.GetCurrentProcess().MainModule.ModuleName;
+        string PName = System.IO.Path.GetFileNameWithoutExtension(MName);
+        System.Diagnostics.Process[] myProcess = System.Diagnostics.Process.GetProcessesByName(PName);
+
+        if (myProcess.Length > 1)
+        {
+            MessageBox.Show("程序已在运行，请勿重复运行", "HiPcMijia.UI");
+            Debug.Warning("~~~~~尝试运行多个UI进程，已阻止~~~~~");
+            Environment.Exit(0);
+            return;
+        }
+
+        #endregion
+
+        try
+        {
+            InitializeComponent();
+            this.MouseLeave += MainWindow_MouseLeave;
+        }
+        catch (Exception ex)
+        {
+            Debug.Error($"MainWindow Startup Error: {ex}");
+        }
+        
     }
 
     private void MainWindow_MouseLeave(object sender, MouseEventArgs e)
@@ -44,12 +74,9 @@ public partial class MainWindow : Window
         init_Window();
         restartBtn_Click(null,null);
         OnDrawTextBlock();
-
-
         this.notifyIcon = new System.Windows.Forms.NotifyIcon();
         this.notifyIcon.Text = "HiPcMijia";
-        this.notifyIcon.Icon =
-            new System.Drawing.Icon("C:\\Users\\15860\\Documents\\HiPcMijia\\HiPcMijia.UI\\icon.ico");
+        this.notifyIcon.Icon = (System.Drawing.Icon)Properties.Resources.ResourceManager.GetObject("icon");
         this.notifyIcon.Visible = true;
         this.notifyIcon.Click += notifyIcon_Click;
 
@@ -128,7 +155,7 @@ public partial class MainWindow : Window
         }
         catch (Exception exception)
         {
-            sending_Notifications($"通知HiPcMijia进程发生错误：{exception}");
+            sending_Notifications($"停止HiPcMijia进程发生错误：{exception}");
         }
         OnDrawTextBlock();
     }
@@ -159,5 +186,31 @@ public partial class MainWindow : Window
             this.textBlock.Text = "未连接";
         }
     }
-    
+
+    private void setStartUpBtn_Click(object sender, RoutedEventArgs e)
+    {
+        RegistryKey? registryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+        if (registryKey != null)
+        {
+            registryKey.SetValue("HiPcMijia", Application.ExecutablePath);
+            MessageBox.Show(@"已设置开机自启设置", @"HiPcMijia", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+    }
+
+    private void removeStartUpBtn_Click(object sender, RoutedEventArgs e)
+    {
+        RegistryKey? registryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+        if (registryKey != null)
+        {
+            registryKey.DeleteValue("HiPcMijia", false);
+            MessageBox.Show(@"已移除开机自启设置", @"HiPcMijia", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+    }
+
+
+    private void quitBtn_Click(object sender, RoutedEventArgs e)
+    {
+        HiPcMijiaProcess.Stop();
+        Environment.Exit(0);
+    }
 }

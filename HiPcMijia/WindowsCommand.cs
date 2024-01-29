@@ -7,6 +7,7 @@ using System.Management;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using NAudio.CoreAudioApi;
+using NAudio.Dsp;
 
 namespace HiPcMijia;
 
@@ -14,13 +15,20 @@ public class WindowsCommand
 {
     public static void Shutdown()
     {
-        Debug.Log($"[Windows]Power off");
-        Process.Start("shutdown", "/s /t 0");
-        Process currentProcess = Process.GetCurrentProcess();
-        Process[] processes = Process.GetProcessesByName(currentProcess.ProcessName);
-        foreach (Process process in processes)
+        try
         {
-            process.Kill();
+            Debug.Log($"[Windows]Power off");
+            Process.Start("shutdown", "/s /t 0");
+            Process currentProcess = Process.GetCurrentProcess();
+            Process[] processes = Process.GetProcessesByName(currentProcess.ProcessName);
+            foreach (Process process in processes)
+            {
+                process.Kill();
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.Error($"[Windows]Shutdown failed:{ex}");
         }
     }
 
@@ -41,7 +49,6 @@ public class WindowsCommand
             Debug.Error($"[Windows]SetVolume failed:{ex}");
         }
     }
-
 
     public static int GetVolume()
     {
@@ -89,13 +96,83 @@ public class WindowsCommand
             var brightness = new AdjustScreenByWmi().GetBrightness();
             return brightness;
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
+            Debug.Error($"[Windows]GetScreenBrightness failed:{ex}");
             return 100;
         }
         
     }
-    
+
+    public static void StartBluetooth()
+    {
+        try
+        {
+            string query = "SELECT * FROM Win32_BluetoothRadio";
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
+            foreach (ManagementObject bluetoothRadio in searcher.Get())
+            {
+                bluetoothRadio.InvokeMethod("TurnOn", null); // 打开蓝牙
+                Debug.Log($"[Windows]StartBluetooth");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.Error($"[Windows]StartBluetooth failed:{ex}");
+        }
+    }
+
+    public static void StopBluetooth()
+    {
+        try
+        {
+            string query = "SELECT * FROM Win32_BluetoothRadio";
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
+            foreach (ManagementObject bluetoothRadio in searcher.Get())
+            {
+                bluetoothRadio.InvokeMethod("TurnOff", null); // 关闭蓝牙
+                Debug.Log($"[Windows]StopBluetooth");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.Error($"[Windows]StopBluetooth failed:{ex}");
+        }
+    }
+
+    public static bool IsBluetoothEnabled()
+    {
+        try
+        {
+            string query = "SELECT * FROM Win32_BluetoothRadio WHERE PNPDeviceID='BTHENUM\\{YOUR_BLUETOOTH_DEVICE_ID}\\7&1a91a8&0& Enumerator'";
+            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(query))
+            {
+                using (ManagementObjectCollection devices = searcher.Get())
+                {
+                    foreach (ManagementObject device in devices)
+                    {
+                        bool isEnabled = (bool)device["PoweredOn"];
+                        return isEnabled;
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.Error($"[Windows]GetBluetooth failed:{ex}");
+        }
+        return false;
+    }
+
+
+
+
+
+
+
+
+
+
     [DllImport("user32.dll")]
     public static extern int SendMessage(IntPtr hWnd, uint Msg, uint wParam, int lParam);
     private static readonly IntPtr HWND_BROADCAST = new IntPtr(0xffff);

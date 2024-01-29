@@ -18,7 +18,10 @@ public class FunctionSetting
     
     public bool PcScreenBrightness { get; set; }
     public string PcScreenBrightnessName { get; set; }
-    
+
+    public bool PcBluetooth { get; set; }
+    public string PcBluetoothName { get; set; }
+
     public int ReportingInterval { get; set; }
 }
 
